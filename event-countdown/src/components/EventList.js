@@ -1,39 +1,36 @@
 import React, { useState } from "react";
 import CountdownTimer from "./CountdownTimer";
+import EventDetailsModal from "./EventDetailsModal";
 
 const EventList = ({ events, deleteEvent, editEvent }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [showCompleted, setShowCompleted] = useState(false);
-  const [sortByDate, setSortByDate] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
-  const toggleCompletion = (index) => {
-    const updatedEvents = [...events];
-    updatedEvents[index].completed = !updatedEvents[index].completed;
-    editEvent(updatedEvents[index], index);
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch = event.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "All" || event.category === selectedCategory;
+    const matchesDateRange =
+      (!startDate || new Date(event.date) >= new Date(startDate)) &&
+      (!endDate || new Date(event.date) <= new Date(endDate));
+    return matchesSearch && matchesCategory && matchesDateRange;
+  });
+
+  const handleShowModal = (event) => {
+    setSelectedEvent(event);
+    setShowModal(true);
   };
 
-  const filteredEvents = events
-    .filter((event) => {
-      const matchesSearch = event.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesCategory =
-        selectedCategory === "All" || event.category === selectedCategory;
-      const matchesDateRange =
-        (!startDate || new Date(event.date) >= new Date(startDate)) &&
-        (!endDate || new Date(event.date) <= new Date(endDate));
-      const matchesCompletion = showCompleted || !event.completed;
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesDateRange &&
-        matchesCompletion
-      );
-    })
-    .sort((a, b) => (sortByDate ? new Date(a.date) - new Date(b.date) : 0));
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedEvent(null);
+  };
 
   return (
     <div>
@@ -70,40 +67,13 @@ const EventList = ({ events, deleteEvent, editEvent }) => {
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
-        <div className="form-check mt-2">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            checked={showCompleted}
-            onChange={() => setShowCompleted(!showCompleted)}
-          />
-          <label className="form-check-label">Show Completed Events</label>
-        </div>
-        <div className="form-check mt-2">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            checked={sortByDate}
-            onChange={() => setSortByDate(!sortByDate)}
-          />
-          <label className="form-check-label">Sort by Date</label>
-        </div>
       </div>
 
       <div className="list-group">
         {filteredEvents.map((event, index) => (
           <div
             key={index}
-            className={`list-group-item d-flex justify-content-between align-items-center ${
-              event.completed ? "completed" : ""
-            }`}
-            style={{
-              backgroundColor:
-                new Date(event.date).getTime() - Date.now() <
-                  24 * 60 * 60 * 1000 && !event.completed
-                  ? "#fff3cd"
-                  : "",
-            }}
+            className="list-group-item d-flex justify-content-between align-items-center"
           >
             <div>
               <h5>{event.name}</h5>
@@ -111,16 +81,14 @@ const EventList = ({ events, deleteEvent, editEvent }) => {
                 <strong>Category:</strong> {event.category}
               </p>
               <CountdownTimer eventDate={event.date} eventTime={event.time} />
+              <button
+                onClick={() => handleShowModal(event)}
+                className="btn btn-info mt-2"
+              >
+                View Details
+              </button>
             </div>
             <div>
-              <button
-                onClick={() => toggleCompletion(index)}
-                className={`btn ${
-                  event.completed ? "btn-secondary" : "btn-success"
-                } mr-2`}
-              >
-                {event.completed ? "Mark Incomplete" : "Mark Complete"}
-              </button>
               <button
                 onClick={() => editEvent(event, index)}
                 className="btn btn-warning mr-2"
@@ -140,6 +108,14 @@ const EventList = ({ events, deleteEvent, editEvent }) => {
           <p className="text-center mt-3">No events found</p>
         )}
       </div>
+
+      {selectedEvent && (
+        <EventDetailsModal
+          event={selectedEvent}
+          show={showModal}
+          handleClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 };

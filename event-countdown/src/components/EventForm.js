@@ -10,6 +10,8 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
   const [category, setCategory] = useState(categories[0]);
   const [reminder, setReminder] = useState("");
   const [recurrence, setRecurrence] = useState("None");
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -20,13 +22,23 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
       setCategory(eventToEdit.category);
       setReminder(eventToEdit.reminder || "");
       setRecurrence(eventToEdit.recurrence || "None");
+      setDescription(eventToEdit.description || "");
       setIsEditing(true);
     }
   }, [eventToEdit]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const eventData = { name, date, time, category, reminder, recurrence };
+    const eventData = {
+      name,
+      date,
+      time,
+      category,
+      reminder,
+      recurrence,
+      description,
+      location,
+    };
     if (isEditing) {
       editEvent(eventData);
     } else {
@@ -42,6 +54,8 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
     setCategory(categories[0]);
     setReminder("");
     setRecurrence("None");
+    setDescription("");
+    setLocation("");
     setIsEditing(false);
   };
 
@@ -114,6 +128,23 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
             </option>
           ))}
         </select>
+      </div>
+      <div className="form-group">
+        <label>Description</label>
+        <textarea
+          className="form-control"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </div>
+      <div className="form-group">
+        <label>Location</label>
+        <input
+          type="text"
+          className="form-control"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
       </div>
       <button type="submit" className="btn btn-primary mt-3">
         {isEditing ? "Update Event" : "Add Event"}
