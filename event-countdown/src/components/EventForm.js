@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 
+const categories = ["Work", "Personal", "Family", "Others"];
+
 const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [category, setCategory] = useState(categories[0]);
+  const [reminder, setReminder] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -11,16 +15,19 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
       setName(eventToEdit.name);
       setDate(eventToEdit.date);
       setTime(eventToEdit.time);
+      setCategory(eventToEdit.category);
+      setReminder(eventToEdit.reminder || "");
       setIsEditing(true);
     }
   }, [eventToEdit]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const eventData = { name, date, time, category, reminder };
     if (isEditing) {
-      editEvent({ name, date, time });
+      editEvent(eventData);
     } else {
-      addEvent({ name, date, time });
+      addEvent(eventData);
     }
     clearForm();
   };
@@ -29,6 +36,8 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
     setName("");
     setDate("");
     setTime("");
+    setCategory(categories[0]);
+    setReminder("");
     setIsEditing(false);
   };
 
@@ -62,6 +71,30 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
           value={time}
           onChange={(e) => setTime(e.target.value)}
           required
+        />
+      </div>
+      <div className="form-group">
+        <label>Category</label>
+        <select
+          className="form-control"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="form-group">
+        <label>Reminder (minutes before event)</label>
+        <input
+          type="number"
+          className="form-control"
+          value={reminder}
+          onChange={(e) => setReminder(e.target.value)}
+          min="0"
         />
       </div>
       <button type="submit" className="btn btn-primary mt-3">
