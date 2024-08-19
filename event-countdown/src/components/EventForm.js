@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const categories = ["Work", "Personal", "Family", "Others"];
+const recurrenceOptions = ["None", "Daily", "Weekly", "Monthly", "Yearly"];
 
 const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
   const [name, setName] = useState("");
@@ -8,6 +9,7 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
   const [time, setTime] = useState("");
   const [category, setCategory] = useState(categories[0]);
   const [reminder, setReminder] = useState("");
+  const [recurrence, setRecurrence] = useState("None");
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -17,13 +19,14 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
       setTime(eventToEdit.time);
       setCategory(eventToEdit.category);
       setReminder(eventToEdit.reminder || "");
+      setRecurrence(eventToEdit.recurrence || "None");
       setIsEditing(true);
     }
   }, [eventToEdit]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const eventData = { name, date, time, category, reminder };
+    const eventData = { name, date, time, category, reminder, recurrence };
     if (isEditing) {
       editEvent(eventData);
     } else {
@@ -38,6 +41,7 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
     setTime("");
     setCategory(categories[0]);
     setReminder("");
+    setRecurrence("None");
     setIsEditing(false);
   };
 
@@ -96,6 +100,20 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
           onChange={(e) => setReminder(e.target.value)}
           min="0"
         />
+      </div>
+      <div className="form-group">
+        <label>Recurrence</label>
+        <select
+          className="form-control"
+          value={recurrence}
+          onChange={(e) => setRecurrence(e.target.value)}
+        >
+          {recurrenceOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
       </div>
       <button type="submit" className="btn btn-primary mt-3">
         {isEditing ? "Update Event" : "Add Event"}
