@@ -1,78 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./components/Home";
 import EventForm from "./components/EventForm";
 import EventList from "./components/EventList";
-import "./styles/App.css";
-
-const categories = ["All", "Work", "Personal", "Family", "Others"];
+import Countdowns from "./components/Countdowns";
 
 const App = () => {
   const [events, setEvents] = useState([]);
-  const [eventToEdit, setEventToEdit] = useState(null);
-  const [editIndex, setEditIndex] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  useEffect(() => {
-    const storedEvents = JSON.parse(localStorage.getItem("events"));
-    if (storedEvents) {
-      setEvents(storedEvents);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("events", JSON.stringify(events));
-  }, [events]);
-
-  const addEvent = (newEvent) => {
-    setEvents([...events, newEvent]);
-  };
-
-  const deleteEvent = (index) => {
-    const updatedEvents = events.filter((_, i) => i !== index);
-    setEvents(updatedEvents);
-  };
-
-  const editEvent = (updatedEvent) => {
-    const updatedEvents = [...events];
-    updatedEvents[editIndex] = updatedEvent;
-    setEvents(updatedEvents);
-    setEventToEdit(null);
-    setEditIndex(null);
-  };
-
-  const startEditing = (event, index) => {
-    setEventToEdit(event);
-    setEditIndex(index);
+  const addEvent = (eventData) => {
+    setEvents([...events, eventData]);
   };
 
   return (
-    <div className="container">
-      <h1 className="text-center my-4">Event Countdown</h1>
-      <EventForm
-        addEvent={addEvent}
-        editEvent={editEvent}
-        eventToEdit={eventToEdit}
-      />
-      <div className="mb-4">
-        <label>Filter by Category</label>
-        <select
-          className="form-control"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
-      <EventList
-        events={events}
-        deleteEvent={deleteEvent}
-        editEvent={startEditing}
-        selectedCategory={selectedCategory === "All" ? null : selectedCategory}
-      />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/add-event" element={<EventForm addEvent={addEvent} />} />
+        <Route path="/events" element={<EventList events={events} />} />
+        <Route path="/countdowns" element={<Countdowns events={events} />} />
+      </Routes>
+    </Router>
   );
 };
 

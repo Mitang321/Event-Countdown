@@ -23,6 +23,7 @@ const EventForm = ({ addEvent, editEvent, eventToEdit }) => {
       setReminder(eventToEdit.reminder || "");
       setRecurrence(eventToEdit.recurrence || "None");
       setDescription(eventToEdit.description || "");
+      setLocation(eventToEdit.location || "");
       setIsEditing(true);
     }
   }, [eventToEdit]);
