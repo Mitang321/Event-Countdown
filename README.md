@@ -1,5 +1,10 @@
 ## Welcome to Event-Countdown
 
+## Live Preview
+
+[Live Preview](https://event-countdown-ten.vercel.app/)
+
+
 ## Overview
 
 The Event Countdown App is a React application designed to help you manage and track your events. It features a user-friendly interface to add new events, view countdowns, and stay organized.
